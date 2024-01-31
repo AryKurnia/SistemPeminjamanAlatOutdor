@@ -20,7 +20,9 @@ type
     DBGrid1: TDBGrid;
     ZQpeminjam: TZQuery;
     DataSource1: TDataSource;
+    Peminjaman1: TMenuItem;
     procedure Alat1Click(Sender: TObject);
+    procedure Peminjaman1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -34,11 +36,16 @@ implementation
 
 {$R *.dfm}
 
-uses UnitAlat;
+uses UnitAlat, UnitPeminjaman;
 
 procedure TFormHome.Alat1Click(Sender: TObject);
 begin
   FormAlat.Show;
+end;
+
+procedure TFormHome.Peminjaman1Click(Sender: TObject);
+begin
+  FormPeminjaman.Show;
 end;
 
 end.
