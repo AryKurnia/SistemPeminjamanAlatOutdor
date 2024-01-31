@@ -152,7 +152,7 @@ object FormHome: TFormHome
     Protocol = 'mysql'
     LibraryLocation = 
       'C:\Users\CAMBANG\OneDrive\Dokumen\Embarcadero\Studio\Projects\Si' +
-      'stemPeminjamanAlatOutdor\libmysql the mollon\libmysql.dll'
+      'stemPeminjamanAlatOutdor\libmysql-the-mollon\libmysql.dll'
     Left = 560
     Top = 8
   end
