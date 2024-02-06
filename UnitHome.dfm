@@ -32,93 +32,6 @@ object FormHome: TFormHome
     Height = 322
     Caption = 'Peminjaman Hari Ini'
     TabOrder = 0
-    object DBGrid1: TDBGrid
-      Left = 3
-      Top = 24
-      Width = 606
-      Height = 289
-      DataSource = DataSource1
-      ReadOnly = True
-      TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -12
-      TitleFont.Name = 'Segoe UI'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'IDP'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Nama'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Organisasi'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Alamat'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Tanggal_Meminjam'
-          ReadOnly = False
-          Title.Caption = 'Tanggal Meminjam'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Tanggal_Kembali'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Status'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -12
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Visible = True
-        end>
-    end
   end
   object MainMenu1: TMainMenu
     Left = 8
@@ -149,7 +62,7 @@ object FormHome: TFormHome
     Database = 'mapala'
     User = 'root'
     Password = ''
-    Protocol = 'mysql'
+    Protocol = 'mysql-5'
     LibraryLocation = 
       'C:\Users\CAMBANG\OneDrive\Dokumen\Embarcadero\Studio\Projects\Si' +
       'stemPeminjamanAlatOutdor\libmysql-the-mollon\libmysql.dll'

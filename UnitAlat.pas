@@ -35,6 +35,7 @@ type
     procedure btnDeleteClick(Sender: TObject);
   private
     { Private declarations }
+    function GenerateRandomID: Integer; 
   public
     { Public declarations }
   end;
@@ -42,8 +43,8 @@ type
 var
   FormAlat: TFormAlat;
 
-  maxID, jumlah : Integer;
-  newID, nama, klasifikasi, merek, warna : string;
+  id, jumlah : Integer;
+  nama, klasifikasi, merek, warna : string;
 
 implementation
 
@@ -53,7 +54,6 @@ uses UnitHome;
 
 procedure TFormAlat.btnClearClick(Sender: TObject);
 begin
-  newID := '';
   nama := '';
   klasifikasi := '';
   merek := '';
@@ -123,18 +123,14 @@ begin
     begin
       SQL.Clear;
       // Membuat ID Alat dari ID Increment
-      SQL.Add('SELECT MAX(id) AS MaxID FROM `alat`');
-      Open;
-      maxID := FieldByName('MaxID').AsInteger;
-      Inc(maxID);
-      newID := Format('AL%.4d', [maxID]);
+      id := GenerateRandomID;
 
       // Membersihkan SQL dan melakukan oprasi Insert
       SQL.Clear;
       SQL.Add('SELECT * FROM `alat`');
       Open;
       Insert;
-      FieldByName('IDAL').AsString := newID;
+      FieldByName('id_alat').AsInteger := id;
       FieldByName('Nama').AsString := nama;
       FieldByName('Klasifikasi').AsString := klasifikasi;
       FieldByName('Merek').AsString := merek;
@@ -151,6 +147,27 @@ begin
     ShowMessage('Mohon isi data terlebi dahulu!');
   end;// End If Else
 
+end;
+
+function TFormAlat.GenerateRandomID: integer;
+var
+  i, randomID: Integer;
+begin
+  // Set seed untuk random number generator
+  Randomize;
+
+  // Inisialisasi randomID dengan kosong
+  randomID := 0;
+
+  // Generate 4 karakter acak untuk ID
+  for i := 1 to 4 do
+  begin
+    // Mendapatkan karakter acak dengan ASCII antara 48 ('0') dan 57 ('9')
+    randomID := randomID + Random(57 - 48 + 1) + 48;
+  end;
+
+  // Mengembalikan ID yang dihasilkan
+  Result := randomID;
 end;
 
 procedure TFormAlat.btnUpdateClick(Sender: TObject);

@@ -5,40 +5,61 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, ZAbstractRODataset,
-  ZAbstractDataset, ZDataset, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls;
+  ZAbstractDataset, ZDataset, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls,
+  frxSmartMemo, frCoreClasses, frxClass;
 
 type
   TFormPeminjaman = class(TForm)
     ZQpeminjam: TZQuery;
     Label1: TLabel;
-    DataSource1: TDataSource;
+    dsPeminjam: TDataSource;
     GroupBox1: TGroupBox;
-    DBGrid1: TDBGrid;
     GroupBox2: TGroupBox;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
     tbNama: TEdit;
     tbOrganisasi: TEdit;
-    tbAlamat: TEdit;
-    dtTanggalPeminjaman: TDateTimePicker;
-    dtTanggalPengembalian: TDateTimePicker;
+    tbKontak: TEdit;
+    GroupBox3: TGroupBox;
     Label7: TLabel;
-    tbStatus: TEdit;
-    btnInsert: TButton;
-    btnUpdate: TButton;
-    btnDelete: TButton;
+    tbJumlah: TEdit;
+    Label8: TLabel;
+    Label5: TLabel;
+    dtTanggalPengembalian: TDateTimePicker;
+    Label6: TLabel;
+    dtTanggalPeminjaman: TDateTimePicker;
+    tbAlatTersedia: TEdit;
+    Label9: TLabel;
+    tbKlasifikasi: TEdit;
+    tbAlamat: TEdit;
+    Label10: TLabel;
     btnClear: TButton;
+    btnDelete: TButton;
+    btnInsert: TButton;
     btnPrint: TButton;
+    btnUpdate: TButton;
+    lbAlat: TListBox;
+    ZQalat: TZQuery;
+    dsAlat: TDataSource;
+    ZQmeminjamAlat: TZQuery;
+    dsMeminjamAlat: TDataSource;
+    DBGrid1: TDBGrid;
+    Label11: TLabel;
+    tbMerek: TEdit;
     procedure DBGrid1CellClick(Column: TColumn);
     procedure btnInsertClick(Sender: TObject);
     procedure btnUpdateClick(Sender: TObject);
     procedure btnClearClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure lbAlatClick(Sender: TObject);
+
+    procedure InsertPeminjam(const id_peminjam: integer);
+    procedure InsertMeminjamAlat(const id_meminjam, id_peminjam, id_alat: integer);
   private
     { Private declarations }
+    function GenerateRandomID: Integer;
   public
     { Public declarations }
   end;
@@ -46,8 +67,14 @@ type
 var
   FormPeminjaman: TFormPeminjaman;
 
-  nama, organisasi, alamat, status : string;
+  ZQuery : TZQuery;
+  idAlat, alatTersedia, jumlah: Integer;
+  klasifikasi, merekAlat : string;
+
+  nama, organisasi, alamat, kontak : string;
   tanggalPeminjaman, tanggalPengembalian : TDate;
+
+
 
 implementation
 
@@ -60,16 +87,16 @@ begin
   nama := '';
   organisasi := '';
   alamat := '';
+  kontak := '';
   tanggalPeminjaman := Date;
   tanggalPengembalian := Date;
-  status := '';
 
   tbNama.Text := nama;
   tbOrganisasi.Text := organisasi;
   tbAlamat.Text := alamat;
+  tbKontak.Text := kontak;
   dtTanggalPeminjaman.Date := tanggalPeminjaman;
   dtTanggalPengembalian.Date  := tanggalPengembalian;
-  tbStatus.Text := status;
 
   // Menon Aktifkan Tombol(Button)
   btnUpdate.Enabled := False;
@@ -92,16 +119,16 @@ begin
         nama := '';
         organisasi := '';
         alamat := '';
+        kontak := '';
         tanggalPeminjaman := Date;
         tanggalPengembalian := Date;
-        status := '';
 
         tbNama.Text := nama;
         tbOrganisasi.Text := organisasi;
         tbAlamat.Text := alamat;
+        tbKontak.Text := kontak;
         dtTanggalPeminjaman.Date := tanggalPeminjaman;
         dtTanggalPengembalian.Date  := tanggalPengembalian;
-        tbStatus.Text := status;
 
         // Tampilkan pesan sukses
         ShowMessage('Data Berhasil Dihapus!');
@@ -116,51 +143,93 @@ end;
 
 procedure TFormPeminjaman.btnInsertClick(Sender: TObject);
 var
-  maxID : Integer;
-  newID : String;
+  id_peminjam, id_meminjam, id_alat: Integer;
 begin
-  // Mengisi masing masi fariabel
+  // Mengisi nilai variabel
   nama := tbNama.Text;
   organisasi := tbOrganisasi.Text;
   alamat := tbAlamat.Text;
+  kontak := tbKontak.Text;
   tanggalPeminjaman := dtTanggalPeminjaman.Date;
   tanggalPengembalian := dtTanggalPengembalian.Date;
-  status := tbStatus.Text;
+  jumlah := StrToInt(tbJumlah.Text);
 
-  // Memastikan Agar Semua Fariabel terisi menggunakan If
-  if (nama <> '') and (alamat <> '') and (tanggalPeminjaman <> null) and (tanggalPengembalian <> null) then
+  // Memastikan agar semua variabel terisi
+  if (nama <> '') and (alamat <> '') and (tanggalPeminjaman <> 0) and (tanggalPengembalian <> 0) then
   begin
-    with ZQpeminjam do
-    begin
-      SQL.Clear;
-      // Membuat ID Alat dari ID Increment
-      SQL.Add('SELECT MAX(id) AS MaxID FROM `alat`');
-      Open;
-      maxID := FieldByName('MaxID').AsInteger;
-      Inc(maxID);
-      newID := Format('PM%.4d', [maxID]);
+    // Membuat ID Peminjam dari ID Increment    
+    id_peminjam := GenerateRandomID;
+    id_meminjam := GenerateRandomID;
+    id_alat := idAlat;
 
-      // Membersihkan SQL dan melakukan oprasi Insert
-      SQL.Clear;
-      SQL.Add('SELECT * FROM `peminjam`');
-      Open;
-      Insert;
-      FieldByName('IDP').AsString := newID;
-      FieldByName('Nama').AsString := nama;
-      FieldByName('Organisasi').AsString := organisasi;
-      FieldByName('Alamat').AsString := alamat;
-      FieldByName('Tanggal_Meminjam').AsDateTime := tanggalPeminjaman;
-      FieldByName('Tanggal_Kembali').AsDateTime := tanggalPengembalian;
-      FieldByName('Status').AsString := status;
-      Post;
+    // Memasukkan data ke tabel peminjam
+    InsertPeminjam(id_peminjam); 
 
-      ShowMessage('Data Berhasil Ditambahkan!');
-    end;
+    // Memasukkan data ke tabel meminjam_alat
+    InsertMeminjamAlat(id_meminjam, id_peminjam, id_alat);
+
+    ShowMessage('Data Berhasil Ditambahkan!');
   end
   else
   begin
-    // Menampilkan Pesan jika ada fariabel yang kosong
-    ShowMessage('Mohon isi data terlebi dahulu!');
+    ShowMessage('Mohon isi data terlebih dahulu!');
+  end;
+end;
+
+function TFormPeminjaman.GenerateRandomID: integer;
+var
+  i, randomID: Integer;
+begin
+  // Set seed untuk random number generator
+  Randomize;
+
+  // Inisialisasi randomID dengan kosong
+  randomID := 0;
+
+  // Generate 4 karakter acak untuk ID
+  for i := 1 to 4 do
+  begin
+    // Mendapatkan karakter acak dengan ASCII antara 48 ('0') dan 57 ('9')
+    randomID := randomID + Random(57 - 48 + 1) + 48;
+  end;
+
+  // Mengembalikan ID yang dihasilkan
+  Result := randomID;
+end;
+
+procedure TFormPeminjaman.InsertPeminjam(const id_peminjam: integer);
+begin
+  ZQuery := ZQpeminjam;
+  with ZQuery do
+  begin
+    SQL.Clear;
+    SQL.Add('INSERT INTO `peminjam` (id_peminjam, Nama, Organisasi, Alamat, Kontak)');
+    SQL.Add('VALUES (:id_peminjam, :nama, :organisasi, :alamat, :kontak)');
+    ParamByName('id_peminjam').AsInteger := id_peminjam;
+    ParamByName('Nama').AsString := nama;
+    ParamByName('Organisasi').AsString := organisasi;
+    ParamByName('Alamat').AsString := alamat;
+    ParamByName('Kontak').AsString := kontak;
+    ExecSQL;
+  end;
+end;
+
+procedure TFormPeminjaman.InsertMeminjamAlat(const id_meminjam, id_peminjam, id_alat: integer);
+begin
+  ZQuery := ZQmeminjamAlat;
+  with ZQuery do
+  begin
+    SQL.Clear;
+    SQL.Add('INSERT INTO `meminjam_alat` (id_meminjam, id_peminjam, id_alat, tgl_meminjam, tgl_pengembalian, jumlah)');
+    SQL.Add('VALUES (:id_meminjam, :id_peminjam, :id_alat, :tgl_meminjam, :tgl_pengembalian, :jumlah)');
+    ParamByName('id_meminjam').AsInteger := id_meminjam;
+    ParamByName('id_peminjam').AsInteger := id_peminjam;
+    ParamByName('id_alat').AsInteger := id_alat;
+    ParamByName('tgl_meminjam').AsDate := tanggalPeminjaman;
+    ParamByName('tgl_pengembalian').AsDate := tanggalPengembalian;
+    ParamByName('jumlah').AsInteger := jumlah;
+    ExecSQL;
+    ZQuery.Refresh;
   end;
 end;
 
@@ -177,9 +246,9 @@ begin
         nama := tbNama.Text;
         organisasi := tbOrganisasi.Text;
         alamat := tbAlamat.Text;
+        kontak := tbKontak.Text;
         tanggalPeminjaman := dtTanggalPeminjaman.Date;
         tanggalPengembalian := dtTanggalPengembalian.Date;
-        status := tbStatus.Text;
 
         // Ubah mode edit
         Edit;
@@ -187,9 +256,9 @@ begin
         FieldByName('Nama').AsString := nama;
         FieldByName('Organisasi').AsString := organisasi;
         FieldByName('Alamat').AsString := alamat;
+        FieldByName('Kontak').AsString := kontak;
         FieldByName('Tanggal_Meminjam').AsDateTime := tanggalPeminjaman;
         FieldByName('Tanggal_Kembali').AsDateTime := tanggalPengembalian;
-        FieldByName('Status').AsString := status;
 
         // Lakukan post untuk menyimpan perubahan
         Post;
@@ -217,19 +286,65 @@ begin
     alamat := ZQpeminjam.FieldByName('Alamat').AsString;
     tanggalPeminjaman := ZQpeminjam.FieldByName('Tanggal_Meminjam').AsDateTime;
     tanggalPengembalian := ZQpeminjam.FieldByName('Tanggal_Kembali').AsDateTime;
-    status := ZQpeminjam.FieldByName('Status').AsString;
 
     tbNama.Text := nama;
     tbOrganisasi.Text := organisasi;
     tbAlamat.Text := alamat;
     dtTanggalPeminjaman.Date := tanggalPeminjaman;
     dtTanggalPengembalian.Date  := tanggalPengembalian;
-    tbStatus.Text := status;
 
     // Mengaktifkan Tombol(Button)
     btnUpdate.Enabled := True;
     btnDelete.Enabled := True;
   end;// End If
+end;
+
+procedure TFormPeminjaman.FormCreate(Sender: TObject);
+begin
+  ZQuery := ZQalat;
+
+  // Ambil data dari database dan tambahkan ke ListBox
+  ZQuery.Open;
+  while not ZQuery.Eof do
+  begin
+    lbAlat.Items.AddObject(
+      ZQuery.FieldByName('Nama').AsString,
+      TObject(ZQuery.FieldByName('id_alat').AsInteger)
+    );
+    ZQuery.Next;
+  end;
+end;
+
+procedure TFormPeminjaman.lbAlatClick(Sender: TObject);
+var
+  selectedItemIndex: Integer;
+begin
+  // Mendapatkan indeks item yang dipilih
+  selectedItemIndex := lbAlat.ItemIndex;
+
+  // Memastikan item terpilih valid
+  if (selectedItemIndex > -1) and (selectedItemIndex < lbAlat.Count) then
+  begin
+    // Mendapatkan nilai id_alat dari objek terpilih
+    idAlat := Integer(lbAlat.Items.Objects[selectedItemIndex]);
+
+    // Mengambil nilai Klasifikasi dari database berdasarkan id_alat terpilih
+    ZQuery.First;
+    while not ZQuery.Eof do
+    begin
+      if ZQuery.FieldByName('id_alat').AsInteger = idAlat then
+      begin
+        tbMerek.Text := ZQuery.FieldByName('Merek').AsString;
+        merekAlat := ZQuery.FieldByName('Merek').AsString;
+        tbAlatTersedia.Text := ZQuery.FieldByName('Jumlah').AsString;
+        alatTersedia := ZQuery.FieldByName('Jumlah').AsInteger;
+        tbKlasifikasi.Text := ZQuery.FieldByName('Klasifikasi').AsString;
+        klasifikasi := ZQuery.FieldByName('Klasifikasi').AsString;
+        Break;
+      end;
+      ZQuery.Next;
+    end;
+  end;
 end;
 
 end.

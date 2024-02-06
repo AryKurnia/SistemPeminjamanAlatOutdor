@@ -17,7 +17,6 @@ type
     ZConnection1: TZConnection;
     Label1: TLabel;
     GroupBox1: TGroupBox;
-    DBGrid1: TDBGrid;
     ZQpeminjam: TZQuery;
     DataSource1: TDataSource;
     Peminjaman1: TMenuItem;

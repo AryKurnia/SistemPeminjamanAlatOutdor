@@ -159,18 +159,14 @@ object FormAlat: TFormAlat
     Columns = <
       item
         Expanded = False
-        FieldName = 'IDAL'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI Light'
-        Font.Style = []
+        FieldName = 'id_alat'
         Title.Caption = 'ID Alat'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWindowText
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 51
         Visible = True
       end
       item
@@ -181,6 +177,7 @@ object FormAlat: TFormAlat
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 165
         Visible = True
       end
       item
@@ -191,6 +188,7 @@ object FormAlat: TFormAlat
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 138
         Visible = True
       end
       item
@@ -201,6 +199,7 @@ object FormAlat: TFormAlat
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 69
         Visible = True
       end
       item
@@ -211,6 +210,7 @@ object FormAlat: TFormAlat
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 103
         Visible = True
       end
       item
@@ -221,6 +221,7 @@ object FormAlat: TFormAlat
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
+        Width = 47
         Visible = True
       end>
   end
