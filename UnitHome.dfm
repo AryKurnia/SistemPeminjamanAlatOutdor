@@ -46,6 +46,9 @@ object FormHome: TFormHome
         Caption = 'Peminjaman'
         OnClick = Peminjaman1Click
       end
+      object Laporan1: TMenuItem
+        Caption = 'Laporan'
+      end
     end
     object Keluar1: TMenuItem
       Caption = 'Keluar'

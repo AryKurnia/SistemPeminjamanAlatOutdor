@@ -417,6 +417,7 @@ object FormPeminjaman: TFormPeminjaman
     Top = 8
   end
   object dsMeminjamAlat: TDataSource
+    AutoEdit = False
     DataSet = ZQmeminjamAlat
     Left = 40
     Top = 8

@@ -20,6 +20,7 @@ type
     ZQpeminjam: TZQuery;
     DataSource1: TDataSource;
     Peminjaman1: TMenuItem;
+    Laporan1: TMenuItem;
     procedure Alat1Click(Sender: TObject);
     procedure Peminjaman1Click(Sender: TObject);
   private
@@ -35,7 +36,7 @@ implementation
 
 {$R *.dfm}
 
-uses UnitAlat, UnitPeminjaman;
+uses UnitAlat, UnitPeminjaman, Unit1;
 
 procedure TFormHome.Alat1Click(Sender: TObject);
 begin

@@ -59,7 +59,7 @@ type
     procedure InsertMeminjamAlat(const id_meminjam, id_peminjam, id_alat: integer);
   private
     { Private declarations }
-    function GenerateRandomID: Integer;
+    function GenerateNewID: Integer;
   public
     { Public declarations }
   end;
@@ -158,8 +158,7 @@ begin
   if (nama <> '') and (alamat <> '') and (tanggalPeminjaman <> 0) and (tanggalPengembalian <> 0) then
   begin
     // Membuat ID Peminjam dari ID Increment    
-    id_peminjam := GenerateRandomID;
-    id_meminjam := GenerateRandomID;
+    id_peminjam := GenerateNewID;
     id_alat := idAlat;
 
     // Memasukkan data ke tabel peminjam
@@ -167,6 +166,8 @@ begin
 
     // Memasukkan data ke tabel meminjam_alat
     InsertMeminjamAlat(id_meminjam, id_peminjam, id_alat);
+
+    ZQmeminjamAlat.Refresh;
 
     ShowMessage('Data Berhasil Ditambahkan!');
   end
@@ -176,25 +177,23 @@ begin
   end;
 end;
 
-function TFormPeminjaman.GenerateRandomID: integer;
+function TFormPeminjaman.GenerateNewID: integer;
 var
-  i, randomID: Integer;
+  id_peminjam: Integer;
 begin
-  // Set seed untuk random number generator
-  Randomize;
-
-  // Inisialisasi randomID dengan kosong
-  randomID := 0;
-
-  // Generate 4 karakter acak untuk ID
-  for i := 1 to 4 do
+  with ZQpeminjam do
   begin
-    // Mendapatkan karakter acak dengan ASCII antara 48 ('0') dan 57 ('9')
-    randomID := randomID + Random(57 - 48 + 1) + 48;
-  end;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM `peminjam` WHERE id_peminjam = (SELECT MAX(id_peminjam) FROM peminjam)');
+    Open;
 
-  // Mengembalikan ID yang dihasilkan
-  Result := randomID;
+    // Ambil nilai maksimum dari kolom id
+    id_peminjam := FieldByName('id_peminjam').AsInteger;
+
+    // Tambahkan 1 pada nilai maksimum
+    Inc(id_peminjam);
+  end;
+  Result := id_peminjam;
 end;
 
 procedure TFormPeminjaman.InsertPeminjam(const id_peminjam: integer);
@@ -203,14 +202,16 @@ begin
   with ZQuery do
   begin
     SQL.Clear;
-    SQL.Add('INSERT INTO `peminjam` (id_peminjam, Nama, Organisasi, Alamat, Kontak)');
-    SQL.Add('VALUES (:id_peminjam, :nama, :organisasi, :alamat, :kontak)');
-    ParamByName('id_peminjam').AsInteger := id_peminjam;
-    ParamByName('Nama').AsString := nama;
-    ParamByName('Organisasi').AsString := organisasi;
-    ParamByName('Alamat').AsString := alamat;
-    ParamByName('Kontak').AsString := kontak;
-    ExecSQL;
+    SQL.Add('SELECT * FROM `peminjam`');
+    Open;
+    Insert;
+    FieldByName('id_peminjam').AsInteger := id_peminjam;
+    FieldByName('Nama').AsString := nama;
+    FieldByName('Organisasi').AsString := organisasi;
+    FieldByName('Alamat').AsString := alamat;
+    FieldByName('Kontak').AsString := kontak;
+    Post;
+//    ZQuery.Refresh;
   end;
 end;
 
@@ -220,16 +221,16 @@ begin
   with ZQuery do
   begin
     SQL.Clear;
-    SQL.Add('INSERT INTO `meminjam_alat` (id_meminjam, id_peminjam, id_alat, tgl_meminjam, tgl_pengembalian, jumlah)');
-    SQL.Add('VALUES (:id_meminjam, :id_peminjam, :id_alat, :tgl_meminjam, :tgl_pengembalian, :jumlah)');
-    ParamByName('id_meminjam').AsInteger := id_meminjam;
-    ParamByName('id_peminjam').AsInteger := id_peminjam;
-    ParamByName('id_alat').AsInteger := id_alat;
-    ParamByName('tgl_meminjam').AsDate := tanggalPeminjaman;
-    ParamByName('tgl_pengembalian').AsDate := tanggalPengembalian;
-    ParamByName('jumlah').AsInteger := jumlah;
-    ExecSQL;
-    ZQuery.Refresh;
+    SQL.Add('SELECT * FROM `meminjam_alat`');
+    Open;
+    Insert;
+    FieldByName('id_peminjam').AsInteger := id_peminjam;
+    FieldByName('id_alat').AsInteger := id_alat;
+    FieldByName('tgl_meminjam').AsDateTime := tanggalPeminjaman;
+    FieldByName('tgl_pengembalian').AsDateTime := tanggalPengembalian;
+    FieldByName('jumlah').AsInteger := jumlah;
+    Post;
+//    ZQuery.Refresh;
   end;
 end;
 
